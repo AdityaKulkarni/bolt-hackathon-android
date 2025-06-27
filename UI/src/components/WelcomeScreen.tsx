@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe } from 'lucide-react';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -53,13 +52,17 @@ const WelcomeScreen: React.FC = () => {
         {/* Logo */}
         <div className="mb-8">
           <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-lg mb-6">
-            <Globe size={64} className="text-gray-800" strokeWidth={1.5} />
+            <img
+              src="/app_logo.png"
+              alt="memorie.io Logo"
+              className="w-20 h-20 object-contain"
+            />
           </div>
         </div>
 
         {/* Brand Name */}
         <h1 className="text-2xl font-bold text-gray-900 mb-8 tracking-wide">
-          MEMORIE
+          memorie.io
         </h1>
 
         {/* Tagline */}
@@ -67,13 +70,17 @@ const WelcomeScreen: React.FC = () => {
           Remember the faces that matter.
         </h2>
 
-        {/* Bolt Badge */}
+        {/* Company Badge */}
         <div className="mb-16">
-          <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-xl">b</span>
+          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
+            <img
+              src="/bolt_logo.png.png"
+              alt="Company Logo"
+              className="w-12 h-12 object-contain"
+            />
           </div>
           <p className="text-xs text-gray-600 text-center mt-2 max-w-20">
-            POWERED BY BOLT NEW AI AGENT
+            POWERED BY AI
           </p>
         </div>
 

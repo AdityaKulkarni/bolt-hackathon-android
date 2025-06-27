@@ -37,8 +37,12 @@ const Dashboard: React.FC = () => {
               <h1 className="text-lg font-semibold text-gray-900">{user?.name}</h1>
             </div>
           </div>
-          <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-lg">b</span>
+          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg">
+            <img
+              src="/bolt_logo.png.png"
+              alt="Company Logo"
+              className="w-8 h-8 object-contain"
+            />
           </div>
         </div>
 

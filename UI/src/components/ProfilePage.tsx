@@ -85,11 +85,15 @@ const ProfilePage: React.FC = () => {
 
         {/* App Info */}
         <div className="mt-8 text-center">
-          <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mx-auto mb-2">
-            <span className="text-white font-bold text-lg">b</span>
+          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
+            <img
+              src="/bolt_logo.png.png"
+              alt="Company Logo"
+              className="w-8 h-8 object-contain"
+            />
           </div>
-          <p className="text-xs text-gray-500">MEMORIE v1.0.0</p>
-          <p className="text-xs text-gray-500">Powered by Bolt New AI Agent</p>
+          <p className="text-xs text-gray-500">memorie.io v1.0.0</p>
+          <p className="text-xs text-gray-500">Powered by AI</p>
         </div>
       </div>
 

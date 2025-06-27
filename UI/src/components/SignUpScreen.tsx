@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Globe } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const SignUpScreen: React.FC = () => {
@@ -59,8 +58,12 @@ const SignUpScreen: React.FC = () => {
       <div className="px-6 py-8">
         {/* Header */}
         <div className="flex items-center mb-12">
-          <Globe size={32} className="text-gray-800 mr-3" strokeWidth={1.5} />
-          <h1 className="text-xl font-bold text-gray-900">MEMORIE</h1>
+          <img
+            src="/app_logo.png"
+            alt="memorie.io Logo"
+            className="w-8 h-8 mr-3"
+          />
+          <h1 className="text-xl font-bold text-gray-900">memorie.io</h1>
         </div>
 
         {/* Sign Up Form */}
