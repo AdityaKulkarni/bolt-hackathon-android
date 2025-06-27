@@ -8,6 +8,7 @@ export interface Contact {
   lastSeen?: string;
   location?: string;
   notes?: string;
+  contact?: string;
 }
 
 interface ContactContextType {
@@ -70,7 +71,7 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   useEffect(() => {
     // Load contacts from localStorage or use mock data
-    const storedContacts = localStorage.getItem('memorie_contacts');
+    const storedContacts = localStorage.getItem('memwar_contacts');
     if (storedContacts) {
       const parsed = JSON.parse(storedContacts);
       setContacts(parsed);
@@ -78,7 +79,7 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } else {
       setContacts(mockContacts);
       setRecentContacts(mockContacts);
-      localStorage.setItem('memorie_contacts', JSON.stringify(mockContacts));
+      localStorage.setItem('memwar_contacts', JSON.stringify(mockContacts));
     }
   }, []);
 
@@ -90,7 +91,7 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     const updatedContacts = [...contacts, newContact];
     setContacts(updatedContacts);
-    localStorage.setItem('memorie_contacts', JSON.stringify(updatedContacts));
+    localStorage.setItem('memwar_contacts', JSON.stringify(updatedContacts));
   };
 
   const updateContact = (id: string, contactUpdate: Partial<Contact>) => {
@@ -98,14 +99,14 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
       contact.id === id ? { ...contact, ...contactUpdate } : contact
     );
     setContacts(updatedContacts);
-    localStorage.setItem('memorie_contacts', JSON.stringify(updatedContacts));
+    localStorage.setItem('memwar_contacts', JSON.stringify(updatedContacts));
   };
 
   const deleteContact = (id: string) => {
     const updatedContacts = contacts.filter(contact => contact.id !== id);
     setContacts(updatedContacts);
     setRecentContacts(updatedContacts.slice(0, 4));
-    localStorage.setItem('memorie_contacts', JSON.stringify(updatedContacts));
+    localStorage.setItem('memwar_contacts', JSON.stringify(updatedContacts));
   };
 
   const recordSighting = (contactId: string, location?: string) => {

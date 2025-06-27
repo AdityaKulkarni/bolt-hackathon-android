@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Plus, Search, Edit3, Trash2 } from 'lucide-react';
 import { useContacts } from '../contexts/ContactContext';
+import { useNavigate } from 'react-router-dom';
 import BottomNavigation from './BottomNavigation';
-import AddContactModal from './AddContactModal';
 
 const ContactsPage: React.FC = () => {
   const { contacts, deleteContact } = useContacts();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
 
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -32,7 +32,7 @@ const ContactsPage: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Contacts</h1>
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={() => navigate('/add-contact')}
             className="bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 transition-colors"
           >
             <Plus size={20} />
@@ -94,7 +94,7 @@ const ContactsPage: React.FC = () => {
             </p>
             {!searchTerm && (
               <button
-                onClick={() => setShowAddModal(true)}
+                onClick={() => navigate('/add-contact')}
                 className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition-colors"
               >
                 Add Your First Contact
@@ -103,10 +103,6 @@ const ContactsPage: React.FC = () => {
           </div>
         )}
       </div>
-
-      {showAddModal && (
-        <AddContactModal onClose={() => setShowAddModal(false)} />
-      )}
 
       <BottomNavigation />
     </div>
