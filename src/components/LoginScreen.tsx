@@ -48,7 +48,7 @@ const LoginScreen: React.FC = () => {
         {/* Header */}
         <div className="flex items-center mb-12">
           <Globe size={32} className="text-gray-800 mr-3" strokeWidth={1.5} />
-          <h1 className="text-xl font-bold text-gray-900">MEMWAR</h1>
+          <h1 className="text-xl font-bold text-gray-900">MEMORIE</h1>
         </div>
 
         {/* Login Form */}

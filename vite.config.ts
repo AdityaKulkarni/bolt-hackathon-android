@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'MEMWAR - Remember the faces that matter',
-        short_name: 'MEMWAR',
-        description: 'A PWA to help Alzheimer\'s patients recognize people',
+        name: 'MEMORIE - Remember the faces that matter',
+        short_name: 'MEMORIE',
+        description: 'An App to help Alzheimer\'s patients recognize people',
         theme_color: '#8B5CF6',
         background_color: '#ffffff',
         display: 'standalone',

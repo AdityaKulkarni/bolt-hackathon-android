@@ -88,7 +88,7 @@ const ProfilePage: React.FC = () => {
           <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mx-auto mb-2">
             <span className="text-white font-bold text-lg">b</span>
           </div>
-          <p className="text-xs text-gray-500">MEMWAR v1.0.0</p>
+          <p className="text-xs text-gray-500">MEMORIE v1.0.0</p>
           <p className="text-xs text-gray-500">Powered by Bolt New AI Agent</p>
         </div>
       </div>

@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Check for stored user session
-    const storedUser = localStorage.getItem('memwar_user');
+    const storedUser = localStorage.getItem('memorie_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     
     setUser(mockUser);
-    localStorage.setItem('memwar_user', JSON.stringify(mockUser));
+    localStorage.setItem('memorie_user', JSON.stringify(mockUser));
     setIsLoading(false);
     return true;
   };
@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     
     setUser(mockUser);
-    localStorage.setItem('memwar_user', JSON.stringify(mockUser));
+    localStorage.setItem('memorie_user', JSON.stringify(mockUser));
     setIsLoading(false);
     return true;
   };
@@ -82,13 +82,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) {
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
-      localStorage.setItem('memwar_user', JSON.stringify(updatedUser));
+      localStorage.setItem('memorie_user', JSON.stringify(updatedUser));
     }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('memwar_user');
+    localStorage.removeItem('memorie_user');
   };
 
   return (
