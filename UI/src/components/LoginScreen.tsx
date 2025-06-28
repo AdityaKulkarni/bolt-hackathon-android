@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { Eye, EyeOff } from 'lucide-react';
+import { loginUser, UserLoginRequest } from '../api';
+import { storage } from '../utils/storage';
 
 const LoginScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,14 +22,32 @@ const LoginScreen: React.FC = () => {
     }
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        navigate('/dashboard');
+      setIsLoading(true);
+      
+      const requestBody: UserLoginRequest = {
+        email,
+        password
+      };
+
+      const result = await loginUser(requestBody);
+
+      if (result.success && result.data) {
+        const loginResponse = result.data;
+        
+        if (loginResponse.user) {
+          // Store user data in localStorage
+          storage.setUser(loginResponse.user);
+          navigate('/dashboard');
+        } else {
+          setError(loginResponse.message || 'Login failed');
+        }
       } else {
-        setError('Invalid email or password');
+        setError(result.error || 'Invalid email or password');
       }
-    } catch (err) {
-      setError('An error occurred. Please try again.');
+    } catch {
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -76,15 +97,23 @@ const LoginScreen: React.FC = () => {
               />
             </div>
 
-            <div>
+            <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-4 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-4 pr-12 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 disabled={isLoading}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                disabled={isLoading}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </div>
 
             <button

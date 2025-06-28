@@ -41,11 +41,11 @@ const ProfilePage: React.FC = () => {
         {/* Profile Info */}
         <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
           <div className="flex items-center">
-            <img
-              src={user?.avatar}
-              alt={user?.name}
-              className="w-16 h-16 rounded-full object-cover mr-4"
-            />
+          <div className="w-16 h-16 text-purple-400">
+                  <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
             <div className="flex-1">
               <h2 className="text-xl font-semibold text-gray-900">{user?.name}</h2>
               <p className="text-gray-600">{user?.email}</p>
@@ -87,7 +87,7 @@ const ProfilePage: React.FC = () => {
         <div className="mt-8 text-center">
           <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
             <img
-              src="/bolt_logo.png.png"
+              src="/bolt_logo.png"
               alt="Company Logo"
               className="w-8 h-8 object-contain"
             />

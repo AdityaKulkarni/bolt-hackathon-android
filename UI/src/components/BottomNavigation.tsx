@@ -13,7 +13,7 @@ const BottomNavigation: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4">
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-white border-t border-gray-200 px-6 py-4 w-full lg:w-[40%]">
       <div className="flex justify-around max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;

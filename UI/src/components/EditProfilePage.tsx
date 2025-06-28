@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Settings, Edit3 } from 'lucide-react';
+import {  Settings } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import BottomNavigation from './BottomNavigation';
@@ -63,14 +63,12 @@ const EditProfilePage: React.FC = () => {
         {/* Profile Picture */}
         <div className="flex flex-col items-center mb-8">
           <div className="relative">
-            <img
-              src={user?.avatar}
-              alt={user?.name}
-              className="w-24 h-24 rounded-full object-cover"
-            />
-            <button className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border border-gray-200">
-              <Edit3 size={16} className="text-gray-600" />
-            </button>
+          <div className="w-16 h-16 text-purple-400">
+                  <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+            
           </div>
           <h2 className="text-xl font-semibold text-gray-900 mt-4">{user?.name}</h2>
         </div>
@@ -125,18 +123,7 @@ const EditProfilePage: React.FC = () => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Age
-              </label>
-              <input
-                type="number"
-                value={formData.age}
-                onChange={(e) => handleInputChange('age', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-            </div>
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Gender

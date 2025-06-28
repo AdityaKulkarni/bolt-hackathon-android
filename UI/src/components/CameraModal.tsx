@@ -1,19 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Camera } from 'lucide-react';
 import { useContacts } from '../contexts/ContactContext';
+import { recognizeFace } from '../api/contacts';
+import { TrustedContactResponse } from '../api/types';
+import { storage } from '../utils/storage';
 
 interface CameraModalProps {
   onClose: () => void;
 }
 
+interface RecognizedContact extends TrustedContactResponse {
+  lastSeenText: string;
+}
+
 const CameraModal: React.FC<CameraModalProps> = ({ onClose }) => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [recognizedContact, setRecognizedContact] = useState<any>(null);
+  const [recognizedContact, setRecognizedContact] = useState<RecognizedContact | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { contacts, recordSighting } = useContacts();
+  const { recordSighting } = useContacts();
 
   useEffect(() => {
     startCamera();
@@ -23,6 +31,12 @@ const CameraModal: React.FC<CameraModalProps> = ({ onClose }) => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!capturedImage && videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [capturedImage, stream]);
 
   const startCamera = async () => {
     try {
@@ -52,38 +66,92 @@ const CameraModal: React.FC<CameraModalProps> = ({ onClose }) => {
         const imageData = canvas.toDataURL('image/jpeg');
         setCapturedImage(imageData);
         
-        // Simulate face recognition
-        simulateFaceRecognition();
+        // Convert canvas to blob and perform face recognition
+        canvas.toBlob((blob) => {
+          if (blob) {
+            performFaceRecognition(blob);
+          }
+        }, 'image/jpeg');
       }
     }
   };
 
-  const simulateFaceRecognition = () => {
+  const performFaceRecognition = async (imageBlob: Blob) => {
     setIsProcessing(true);
+    setError(null);
     
-    // Simulate processing time
-    setTimeout(() => {
-      // For demo, randomly select a contact
-      const randomContact = contacts[Math.floor(Math.random() * contacts.length)];
-      setRecognizedContact({
-        ...randomContact,
-        lastSeenText: 'last seen 3 days ago'
-      });
-      setIsProcessing(false);
-    }, 2000);
-  };
+    try {
+      const user = storage.getUser();
+      if (!user?.id) {
+        setError('User not authenticated');
+        setIsProcessing(false);
+        return;
+      }
 
-  const saveSnap = () => {
-    if (recognizedContact) {
-      recordSighting(recognizedContact.id, 'Current Location');
+      // Convert blob to File
+      const imageFile = new File([imageBlob], 'captured-image.jpg', { type: 'image/jpeg' });
+      
+      const response = await recognizeFace(imageFile, user.id);
+      
+      if (response.success && response.data) {
+        const { matches } = response.data;
+        
+        if (matches && matches.length > 0) {
+          // Use the first match (highest confidence)
+          const match = matches[0];
+          setRecognizedContact({
+            ...match,
+            lastSeenText: 'just now'
+          });
+        } else {
+          setRecognizedContact(null);
+        }
+      } else {
+        setError(response.error || 'Face recognition failed');
+      }
+    } catch {
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsProcessing(false);
     }
-    onClose();
   };
 
   const deleteSnap = () => {
     setCapturedImage(null);
     setRecognizedContact(null);
     setIsProcessing(false);
+    setError(null);
+    // Restart camera if needed
+    if (!stream) {
+      startCamera();
+    } else if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+  };
+
+  const saveSnap = () => {
+    if (recognizedContact) {
+      recordSighting(recognizedContact.id, 'Current Location');
+      storage.addRecognitionLog({
+        contactId: recognizedContact.id,
+        name: recognizedContact.name,
+        relationship: recognizedContact.relationship,
+        picture: recognizedContact.picture,
+        phone: recognizedContact.phone,
+        location: recognizedContact.location,
+        timestamp: new Date().toISOString(),
+        image: capturedImage || undefined,
+      });
+    }
+    setCapturedImage(null);
+    setRecognizedContact(null);
+    setError(null);
+    // Restart camera if needed
+    if (!stream) {
+      startCamera();
+    } else if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
   };
 
   return (
@@ -139,6 +207,15 @@ const CameraModal: React.FC<CameraModalProps> = ({ onClose }) => {
           </div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="px-6 mb-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          </div>
+        )}
+
         {/* Recognition Results */}
         {capturedImage && (
           <div className="px-6">
@@ -149,14 +226,27 @@ const CameraModal: React.FC<CameraModalProps> = ({ onClose }) => {
               </div>
             ) : recognizedContact ? (
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  You just saw {recognizedContact.name}
-                </h3>
-                <p className="text-gray-600 mb-6 flex items-center">
+                {/* Contact Details */}
+                <div className="flex flex-col items-center mb-6">
+                  <img
+                    src={`https://boltsample.s3.us-west-1.amazonaws.com/${recognizedContact.picture}`}
+                    alt={recognizedContact.name}
+                    className="w-20 h-20 rounded-full object-cover mb-2"
+                  />
+                  <h3 className="text-lg font-semibold text-gray-900">{recognizedContact.name}</h3>
+                  <p className="text-purple-600 font-medium">{recognizedContact.relationship}</p>
+                  {recognizedContact.phone && (
+                    <p className="text-gray-500 text-sm mt-1">{recognizedContact.phone}</p>
+                  )}
+                  {recognizedContact.location && (
+                    <p className="text-gray-400 text-xs">{recognizedContact.location}</p>
+                  )}
+                </div>
+                {/* End Contact Details */}
+                <p className="text-gray-600 mb-6 flex items-center justify-center">
                   <span className="text-yellow-500 mr-2">👑</span>
                   Your {recognizedContact.relationship.toLowerCase()} — {recognizedContact.lastSeenText}
                 </p>
-                
                 <div className="flex space-x-3">
                   <button
                     onClick={deleteSnap}
