@@ -21,18 +21,7 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Status Bar */}
-      <div className="flex justify-between items-center p-4 text-sm font-medium">
-        <span>9:30</span>
-        <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-black rounded-sm"></div>
-          <div className="w-6 h-3 border border-black rounded-sm">
-            <div className="w-4 h-1 bg-black rounded-sm m-0.5"></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 pb-24">
+      <div className="px-6 pb-24 pt-4">
         {/* Header */}
         <div className="flex items-center mb-8">
           <button
@@ -80,19 +69,6 @@ const SettingsPage: React.FC = () => {
               type="password"
               value={formData.password}
               onChange={(e) => handleInputChange('password', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
-              readOnly
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Phone
-            </label>
-            <input
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
               readOnly
             />

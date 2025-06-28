@@ -23,18 +23,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Status Bar */}
-      <div className="flex justify-between items-center p-4 text-sm font-medium">
-        <span>9:30</span>
-        <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-black rounded-sm"></div>
-          <div className="w-6 h-3 border border-black rounded-sm">
-            <div className="w-4 h-1 bg-black rounded-sm m-0.5"></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 pb-24">
+      <div className="px-6 pb-24 pt-4">
         {/* Header */}
         <h1 className="text-2xl font-bold text-gray-900 mb-8">My Profile</h1>
 
@@ -87,13 +76,12 @@ const ProfilePage: React.FC = () => {
         <div className="mt-8 text-center">
           <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
             <img
-              src="/bolt_logo.png.png"
+              src="/white_circle_360x360 2.png"
               alt="Company Logo"
               className="w-8 h-8 object-contain"
             />
           </div>
-          <p className="text-xs text-gray-500">memorie.io v1.0.0</p>
-          <p className="text-xs text-gray-500">Powered by AI</p>
+          <p className="text-xs text-gray-500">MEMORIE v1.0.0</p>
         </div>
       </div>
 

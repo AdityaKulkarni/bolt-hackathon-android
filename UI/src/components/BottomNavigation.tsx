@@ -8,7 +8,7 @@ const BottomNavigation: React.FC = () => {
 
   const navItems = [
     { icon: Bell, label: 'Updates', path: '/dashboard' },
-    { icon: BookOpen, label: 'Contacts', path: '/contacts' },
+    { icon: BookOpen, label: 'My Contacts', path: '/contacts' },
     { icon: User, label: 'My Profile', path: '/profile' }
   ];
 
@@ -34,11 +34,6 @@ const BottomNavigation: React.FC = () => {
             </button>
           );
         })}
-      </div>
-      
-      {/* Home Indicator */}
-      <div className="flex justify-center mt-2">
-        <div className="w-32 h-1 bg-black rounded-full"></div>
       </div>
     </div>
   );

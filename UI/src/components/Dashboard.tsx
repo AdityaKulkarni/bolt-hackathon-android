@@ -1,37 +1,30 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useContacts } from '../contexts/ContactContext';
-import { Camera, ChevronRight, X } from 'lucide-react';
+import { Camera, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import BottomNavigation from './BottomNavigation';
 import CameraModal from './CameraModal';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const { recentContacts } = useContacts();
+  const navigate = useNavigate();
   const [showCamera, setShowCamera] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Status Bar */}
-      <div className="flex justify-between items-center p-4 text-sm font-medium">
-        <span>9:30</span>
-        <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-black rounded-sm"></div>
-          <div className="w-6 h-3 border border-black rounded-sm">
-            <div className="w-4 h-1 bg-black rounded-sm m-0.5"></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 pb-24">
+      <div className="px-6 pb-24 pt-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
-            <img
-              src={user?.avatar}
-              alt={user?.name}
-              className="w-12 h-12 rounded-full object-cover mr-3"
-            />
+            <button onClick={() => navigate('/profile')}>
+              <img
+                src={user?.avatar}
+                alt={user?.name}
+                className="w-12 h-12 rounded-full object-cover mr-3 hover:opacity-80 transition-opacity"
+              />
+            </button>
             <div>
               <p className="text-sm text-gray-600">Hello</p>
               <h1 className="text-lg font-semibold text-gray-900">{user?.name}</h1>
@@ -39,7 +32,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg">
             <img
-              src="/bolt_logo.png.png"
+              src="/white_circle_360x360 2.png"
               alt="Company Logo"
               className="w-8 h-8 object-contain"
             />
@@ -79,7 +72,11 @@ const Dashboard: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4">
             {recentContacts.map((contact) => (
-              <div key={contact.id} className="bg-white rounded-2xl p-4 shadow-sm">
+              <button
+                key={contact.id}
+                onClick={() => navigate(`/edit-contact/${contact.id}`)}
+                className="bg-white rounded-2xl p-4 shadow-sm hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex flex-col items-center text-center">
                   <img
                     src={contact.avatar}
@@ -90,7 +87,7 @@ const Dashboard: React.FC = () => {
                   <h4 className="font-semibold text-gray-900 mb-1">{contact.name}</h4>
                   <p className="text-xs text-gray-500">{contact.lastSeen}</p>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>

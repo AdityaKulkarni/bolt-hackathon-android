@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'MEMORIE.IO - Remember the faces that matter',
-        short_name: 'MEMORIE.IO',
-        description: 'An app to help Alzheimer\'s patients recognize people',
+        name: 'MEMORIE - Remember the faces that matter',
+        short_name: 'MEMORIE',
+        description: 'A PWA to help Alzheimer\'s patients recognize people',
         theme_color: '#8B5CF6',
         background_color: '#ffffff',
         display: 'standalone',

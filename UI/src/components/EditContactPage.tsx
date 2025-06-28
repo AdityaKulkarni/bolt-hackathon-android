@@ -1,8 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, Edit3, Camera, X, Image } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Edit3, Camera, X, Image, Trash2 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useContacts } from '../contexts/ContactContext';
-import { useAuth } from '../contexts/AuthContext';
 import BottomNavigation from './BottomNavigation';
 
 interface PhotoItem {
@@ -12,29 +11,67 @@ interface PhotoItem {
   updatedAt: string;
 }
 
-const AddContactPage: React.FC = () => {
+const EditContactPage: React.FC = () => {
   const navigate = useNavigate();
-  const { addContact } = useContacts();
-  const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const { contacts, updateContact, deleteContact } = useContacts();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profilePhotoInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
+  const contact = contacts.find(c => c.id === id);
+  
   const [formData, setFormData] = useState({
-    name: '',
-    relationship: '',
-    locationMet: '',
-    contact: '',
-    note: ''
+    name: contact?.name || '',
+    relationship: contact?.relationship || '',
+    locationMet: contact?.location || '',
+    contact: contact?.contact || '',
+    note: contact?.notes || ''
   });
   
-  const [photos, setPhotos] = useState<PhotoItem[]>([]);
-  const [profilePhoto, setProfilePhoto] = useState<string>('');
+  const [photos, setPhotos] = useState<PhotoItem[]>([
+    {
+      id: '1',
+      url: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
+      title: 'Title',
+      updatedAt: 'Updated today'
+    },
+    {
+      id: '2',
+      url: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
+      title: 'Title',
+      updatedAt: 'Updated yesterday'
+    },
+    {
+      id: '3',
+      url: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
+      title: 'Title',
+      updatedAt: 'Updated 2 days ago'
+    }
+  ]);
+  
+  const [profilePhoto, setProfilePhoto] = useState<string>(contact?.avatar || '');
   const [showSavedState, setShowSavedState] = useState(false);
   const [showPhotoOptions, setShowPhotoOptions] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+
+  if (!contact) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Contact not found</p>
+          <button
+            onClick={() => navigate('/contacts')}
+            className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition-colors"
+          >
+            Back to Contacts
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -54,7 +91,7 @@ const AddContactPage: React.FC = () => {
             id: Date.now().toString() + i,
             url: event.target?.result as string,
             title: 'Title',
-            updatedAt: i === 0 ? 'Updated today' : i === 1 ? 'Updated yesterday' : `Updated ${i + 1} days ago`
+            updatedAt: 'Updated today'
           };
           
           setPhotos(prev => [...prev, newPhoto]);
@@ -133,12 +170,12 @@ const AddContactPage: React.FC = () => {
     // Show saved state first
     setShowSavedState(true);
     
-    // After showing saved state, add contact and navigate
+    // After showing saved state, update contact and navigate
     setTimeout(() => {
-      addContact({
+      updateContact(contact.id, {
         name: formData.name,
         relationship: formData.relationship,
-        avatar: profilePhoto || 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
+        avatar: profilePhoto,
         notes: formData.note,
         location: formData.locationMet,
         contact: formData.contact
@@ -146,6 +183,13 @@ const AddContactPage: React.FC = () => {
       
       navigate('/contacts');
     }, 2000);
+  };
+
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this contact?')) {
+      deleteContact(contact.id);
+      navigate('/contacts');
+    }
   };
 
   const handleCancel = () => {
@@ -164,8 +208,8 @@ const AddContactPage: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Contact Saved!</h2>
-          <p className="text-gray-600">Your contact has been successfully added.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Contact Updated!</h2>
+          <p className="text-gray-600">Your contact has been successfully updated.</p>
         </div>
       </div>
     );
@@ -175,14 +219,22 @@ const AddContactPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="px-6 pb-24 pt-4">
         {/* Header */}
-        <div className="flex items-center mb-8">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center">
+            <button
+              onClick={() => navigate('/contacts')}
+              className="mr-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <ArrowLeft size={20} className="text-gray-600" />
+            </button>
+            <h1 className="text-xl font-bold text-gray-900">Details</h1>
+          </div>
           <button
-            onClick={() => navigate('/contacts')}
-            className="mr-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            onClick={handleDelete}
+            className="p-2 rounded-full hover:bg-red-50 transition-colors"
           >
-            <ArrowLeft size={20} className="text-gray-600" />
+            <Trash2 size={20} className="text-red-500" />
           </button>
-          <h1 className="text-xl font-bold text-gray-900">Add Contact</h1>
         </div>
 
         {/* Profile Picture */}
@@ -219,7 +271,7 @@ const AddContactPage: React.FC = () => {
               <div className="flex justify-center mb-4">
                 <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">Add Profile Photo</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">Update Profile Photo</h3>
               
               <div className="space-y-4">
                 <button
@@ -325,19 +377,6 @@ const AddContactPage: React.FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Location Met
-            </label>
-            <input
-              type="text"
-              placeholder="Add a location"
-              value={formData.locationMet}
-              onChange={(e) => handleInputChange('locationMet', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
               Contact
             </label>
             <input
@@ -345,6 +384,19 @@ const AddContactPage: React.FC = () => {
               placeholder="(000) 000 0000"
               value={formData.contact}
               onChange={(e) => handleInputChange('contact', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Location Met
+            </label>
+            <input
+              type="text"
+              placeholder="Add a location"
+              value={formData.locationMet}
+              onChange={(e) => handleInputChange('locationMet', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
@@ -364,17 +416,44 @@ const AddContactPage: React.FC = () => {
             <p className="text-xs text-gray-500 mt-1">300 characters limit</p>
           </div>
 
-          {/* Photo Upload Section */}
+          {/* Meeting Logs Section */}
           <div>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full flex items-center justify-center py-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 transition-colors"
-            >
-              <Camera size={20} className="mr-2 text-gray-400" />
-              <span className="text-gray-600 font-medium">
-                Add up to 10 photos ({photos.length}/10)
-              </span>
-            </button>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Camera size={20} className="mr-2 text-gray-600" />
+                <span className="font-medium text-gray-900">Meeting Logs</span>
+              </div>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-purple-700 transition-colors"
+              >
+                Add Photos
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4">
+              {photos.map((photo) => (
+                <div key={photo.id} className="relative">
+                  <div className="bg-purple-100 rounded-lg p-4 aspect-square flex items-center justify-center relative">
+                    <img
+                      src={photo.url}
+                      alt={photo.title}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    <button
+                      onClick={() => removePhoto(photo.id)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-sm font-medium text-gray-900">{photo.title}</p>
+                    <p className="text-xs text-gray-500">{photo.updatedAt}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
             
             <input
               ref={fileInputRef}
@@ -393,48 +472,6 @@ const AddContactPage: React.FC = () => {
               className="hidden"
             />
           </div>
-
-          {/* Photo Grid */}
-          {photos.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <Camera size={20} className="mr-2 text-gray-600" />
-                  <span className="font-medium text-gray-900">Meeting Logs</span>
-                </div>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-purple-700 transition-colors"
-                >
-                  Add Photos
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4">
-                {photos.map((photo) => (
-                  <div key={photo.id} className="relative">
-                    <div className="bg-purple-100 rounded-lg p-4 aspect-square flex items-center justify-center relative">
-                      <img
-                        src={photo.url}
-                        alt={photo.title}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                      <button
-                        onClick={() => removePhoto(photo.id)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                      >
-                        <X size={12} />
-                      </button>
-                    </div>
-                    <div className="mt-2">
-                      <p className="text-sm font-medium text-gray-900">{photo.title}</p>
-                      <p className="text-xs text-gray-500">{photo.updatedAt}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Action Buttons */}
@@ -460,4 +497,4 @@ const AddContactPage: React.FC = () => {
   );
 };
 
-export default AddContactPage;
+export default EditContactPage;

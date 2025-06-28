@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Plus, Search, Edit3, Trash2 } from 'lucide-react';
 import { useContacts } from '../contexts/ContactContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import BottomNavigation from './BottomNavigation';
 
 const ContactsPage: React.FC = () => {
   const { contacts, deleteContact } = useContacts();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -16,21 +18,19 @@ const ContactsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Status Bar */}
-      <div className="flex justify-between items-center p-4 text-sm font-medium">
-        <span>9:30</span>
-        <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-black rounded-sm"></div>
-          <div className="w-6 h-3 border border-black rounded-sm">
-            <div className="w-4 h-1 bg-black rounded-sm m-0.5"></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 pb-24">
+      <div className="px-6 pb-24 pt-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Contacts</h1>
+          <div className="flex items-center">
+            <button onClick={() => navigate('/profile')}>
+              <img
+                src={user?.avatar}
+                alt={user?.name}
+                className="w-10 h-10 rounded-full object-cover mr-3 hover:opacity-80 transition-opacity"
+              />
+            </button>
+            <h1 className="text-2xl font-bold text-gray-900">Contacts</h1>
+          </div>
           <button
             onClick={() => navigate('/add-contact')}
             className="bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 transition-colors"
@@ -56,7 +56,10 @@ const ContactsPage: React.FC = () => {
           {filteredContacts.map((contact) => (
             <div key={contact.id} className="bg-white rounded-2xl p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <div className="flex items-center">
+                <button
+                  onClick={() => navigate(`/edit-contact/${contact.id}`)}
+                  className="flex items-center flex-1 text-left hover:bg-gray-50 transition-colors rounded-lg p-2 -m-2"
+                >
                   <img
                     src={contact.avatar}
                     alt={contact.name}
@@ -69,10 +72,13 @@ const ContactsPage: React.FC = () => {
                       <p className="text-xs text-gray-400">{contact.lastSeen}</p>
                     )}
                   </div>
-                </div>
+                </button>
                 
                 <div className="flex space-x-2">
-                  <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                  <button 
+                    onClick={() => navigate(`/edit-contact/${contact.id}`)}
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
                     <Edit3 size={16} />
                   </button>
                   <button
