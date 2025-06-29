@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Camera, ChevronRight } from 'lucide-react';
 import BottomNavigation from './BottomNavigation';
 import CameraModal from './CameraModal';

@@ -20,18 +20,7 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Status Bar */}
-      <div className="flex justify-between items-center p-4 text-sm font-medium">
-        <span>9:30</span>
-        <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-black rounded-sm"></div>
-          <div className="w-6 h-3 border border-black rounded-sm">
-            <div className="w-4 h-1 bg-black rounded-sm m-0.5"></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 pb-24">
+      <div className="px-6 pb-24 pt-4">
         {/* Header */}
         <div className="flex items-center mb-8">
           <button

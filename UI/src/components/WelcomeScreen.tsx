@@ -18,15 +18,6 @@ const WelcomeScreen: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 relative overflow-hidden">
       {/* Status Bar */}
-      <div className="flex justify-between items-center p-4 text-sm font-medium">
-        <span>9:30</span>
-        <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-black rounded-sm"></div>
-          <div className="w-6 h-3 border border-black rounded-sm">
-            <div className="w-4 h-1 bg-black rounded-sm m-0.5"></div>
-          </div>
-        </div>
-      </div>
 
       {/* Floating Face Photos */}
       {floatingFaces.map((face, index) => (
@@ -53,8 +44,8 @@ const WelcomeScreen: React.FC = () => {
         <div className="mb-8">
           <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-lg mb-6">
             <img
-              src="/app_logo.png"
-              alt="memorie.io Logo"
+              src="/noun-face-recognition-4583755 1.png"
+              alt="MEMORIE Logo"
               className="w-20 h-20 object-contain"
             />
           </div>
@@ -62,7 +53,7 @@ const WelcomeScreen: React.FC = () => {
 
         {/* Brand Name */}
         <h1 className="text-2xl font-bold text-gray-900 mb-8 tracking-wide">
-          memorie.io
+          MEMORIE
         </h1>
 
         {/* Tagline */}
@@ -79,9 +70,6 @@ const WelcomeScreen: React.FC = () => {
               className="w-16 h-16 object-contain"
             />
           </div>
-          <p className="text-xs text-gray-600 text-center mt-2 max-w-20">
-            POWERED BY AI
-          </p>
         </div>
 
         {/* Get Started Button */}

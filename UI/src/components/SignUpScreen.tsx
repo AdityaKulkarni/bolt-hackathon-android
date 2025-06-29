@@ -89,26 +89,15 @@ const SignUpScreen: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Status Bar */}
-      <div className="flex justify-between items-center p-4 text-sm font-medium">
-        <span>9:30</span>
-        <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-black rounded-sm"></div>
-          <div className="w-6 h-3 border border-black rounded-sm">
-            <div className="w-4 h-1 bg-black rounded-sm m-0.5"></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 py-8">
+      <div className="px-6 py-8 pt-12">
         {/* Header */}
         <div className="flex items-center mb-12">
           <img
-            src="/app_logo.png"
-            alt="memorie.io Logo"
+            src="/noun-face-recognition-4583755 1.png"
+            alt="MEMORIE Logo"
             className="w-8 h-8 mr-3"
           />
-          <h1 className="text-xl font-bold text-gray-900">memorie.io</h1>
+          <h1 className="text-xl font-bold text-gray-900">MEMORIE</h1>
         </div>
 
         {/* Sign Up Form */}

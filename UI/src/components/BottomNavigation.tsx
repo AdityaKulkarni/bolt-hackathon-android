@@ -36,11 +36,6 @@ const BottomNavigation: React.FC = () => {
           );
         })}
       </div>
-      
-      {/* Home Indicator */}
-      <div className="flex justify-center mt-2">
-        <div className="w-32 h-1 bg-black rounded-full"></div>
-      </div>
     </div>
   );
 };
