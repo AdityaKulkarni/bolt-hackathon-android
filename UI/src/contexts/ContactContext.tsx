@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getTrustedContactsByUserId } from '../api/contacts';
+import { TrustedContactResponse } from '../api/types';
+import { storage } from '../utils/storage';
 
 export interface Contact {
   id: string;
@@ -14,10 +17,13 @@ export interface Contact {
 interface ContactContextType {
   contacts: Contact[];
   recentContacts: Contact[];
+  loading: boolean;
+  error: string | null;
   addContact: (contact: Omit<Contact, 'id'>) => void;
   updateContact: (id: string, contact: Partial<Contact>) => void;
   deleteContact: (id: string) => void;
   recordSighting: (contactId: string, location?: string) => void;
+  refreshContacts: () => Promise<void>;
 }
 
 const ContactContext = createContext<ContactContextType | undefined>(undefined);
@@ -30,57 +36,76 @@ export const useContacts = () => {
   return context;
 };
 
-const mockContacts: Contact[] = [
-  {
-    id: '1',
-    name: 'Samantha R.',
-    relationship: 'Wife',
-    avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    lastSeen: '6pm • Golden Gate',
-    location: 'Golden Gate'
-  },
-  {
-    id: '2',
-    name: 'Sarah J',
-    relationship: 'Daughter',
-    avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    lastSeen: '5pm • Peet\'s Cafe',
-    location: 'Peet\'s Cafe'
-  },
-  {
-    id: '3',
-    name: 'Liam Torres',
-    relationship: 'Grandson',
-    avatar: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    lastSeen: '4pm • Home',
-    location: 'Home'
-  },
-  {
-    id: '4',
-    name: 'Brianna Lee',
-    relationship: 'Neice',
-    avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    lastSeen: '11am • 3 Jun 2025',
-    location: 'Park'
-  }
-];
+// Helper function to convert TrustedContactResponse to Contact
+const convertTrustedContactToContact = (trustedContact: TrustedContactResponse): Contact => {
+  return {
+    id: trustedContact.id,
+    name: trustedContact.name,
+    relationship: trustedContact.relationship,
+    avatar: `https://boltsample.s3.us-west-1.amazonaws.com/${trustedContact.picture}`,
+    location: trustedContact.location,
+    notes: trustedContact.note,
+    contact: trustedContact.phone,
+  };
+};
 
 export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [recentContacts, setRecentContacts] = useState<Contact[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchContactsFromAPI = async (): Promise<void> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Check if user is authenticated first
+      if (!storage.isAuthenticated()) {
+        setError('User not authenticated');
+        setLoading(false);
+        return;
+      }
+
+      const user = storage.getUser();
+      
+      if (!user?.id) {
+        setError('User not authenticated');
+        setLoading(false);
+        return;
+      }
+
+      const response = await getTrustedContactsByUserId(user.id);
+      
+      if (response.success && response.data) {
+        const convertedContacts = response.data.map(convertTrustedContactToContact);
+        setContacts(convertedContacts);
+        setRecentContacts(convertedContacts.slice(0, 4));
+        localStorage.setItem('memwar_contacts', JSON.stringify(convertedContacts));
+      } else {
+        setError(response.error || 'Failed to fetch contacts');
+      }
+    } catch {
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshContacts = async (): Promise<void> => {
+    await fetchContactsFromAPI();
+  };
 
   useEffect(() => {
-    // Load contacts from localStorage or use mock data
+    // Load contacts from localStorage first
     const storedContacts = localStorage.getItem('memwar_contacts');
+    
     if (storedContacts) {
       const parsed = JSON.parse(storedContacts);
       setContacts(parsed);
       setRecentContacts(parsed.slice(0, 4));
-    } else {
-      setContacts(mockContacts);
-      setRecentContacts(mockContacts);
-      localStorage.setItem('memwar_contacts', JSON.stringify(mockContacts));
     }
+    // Removed the automatic API fetch on mount - now handled by ContactsPage
   }, []);
 
   const addContact = (contact: Omit<Contact, 'id'>) => {
@@ -128,10 +153,13 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
     <ContactContext.Provider value={{
       contacts,
       recentContacts,
+      loading,
+      error,
       addContact,
       updateContact,
       deleteContact,
-      recordSighting
+      recordSighting,
+      refreshContacts
     }}>
       {children}
     </ContactContext.Provider>

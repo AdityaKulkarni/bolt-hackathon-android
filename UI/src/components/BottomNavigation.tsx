@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Bell, BookOpen, User } from 'lucide-react';
+import { BarChart3, Bell, BookOpen, User } from 'lucide-react';
 
 const BottomNavigation: React.FC = () => {
   const navigate = useNavigate();
@@ -8,12 +8,13 @@ const BottomNavigation: React.FC = () => {
 
   const navItems = [
     { icon: Bell, label: 'Updates', path: '/dashboard' },
-    { icon: BookOpen, label: 'My Contacts', path: '/contacts' },
-    { icon: User, label: 'My Profile', path: '/profile' }
+    { icon: BookOpen, label: 'Contacts', path: '/contacts' },
+    { icon: BarChart3, label: 'Insights', path: '/insights' },
+    { icon: User, label: 'My Profile', path: '/profile' },
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4">
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-white border-t border-gray-200 px-6 py-4 w-full lg:w-[40%]">
       <div className="flex justify-around max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;

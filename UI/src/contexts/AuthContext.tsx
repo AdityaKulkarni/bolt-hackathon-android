@@ -4,16 +4,15 @@ interface User {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
+  avatar: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (name: string, email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  updateProfile?: (updates: Partial<User>) => void;
   isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,68 +30,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user session
-    const storedUser = localStorage.getItem('memorie_user');
+    // Check if user is logged in from localStorage
+    const storedUser = localStorage.getItem('memwar_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-    
+  const login = async (email: string, password: string) => { // eslint-disable-line @typescript-eslint/no-unused-vars
     // Simulate API call
+    setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // For demo purposes, accept any email/password
     const mockUser: User = {
       id: '1',
-      name: 'James Reyes',
-      email,
+      name: 'John Doe',
+      email: email,
       avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2'
     };
     
     setUser(mockUser);
-    localStorage.setItem('memorie_user', JSON.stringify(mockUser));
+    localStorage.setItem('memwar_user', JSON.stringify(mockUser));
     setIsLoading(false);
-    return true;
   };
 
-  const signup = async (name: string, email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-    
+  const signup = async (name: string, email: string, password: string) => { // eslint-disable-line @typescript-eslint/no-unused-vars
     // Simulate API call
+    setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const mockUser: User = {
-      id: Date.now().toString(),
-      name,
-      email,
+      id: '1',
+      name: name,
+      email: email,
       avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2'
     };
     
     setUser(mockUser);
-    localStorage.setItem('memorie_user', JSON.stringify(mockUser));
+    localStorage.setItem('memwar_user', JSON.stringify(mockUser));
     setIsLoading(false);
-    return true;
-  };
-
-  const updateProfile = (updates: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      localStorage.setItem('memorie_user', JSON.stringify(updatedUser));
-    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('memorie_user');
+    localStorage.removeItem('memwar_user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, updateProfile, isLoading }}>
+    <AuthContext.Provider value={{
+      user,
+      isLoading,
+      login,
+      signup,
+      logout
+    }}>
       {children}
     </AuthContext.Provider>
   );
