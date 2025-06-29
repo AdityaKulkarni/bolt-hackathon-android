@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Camera } from 'lucide-react';
 import { useContacts } from '../contexts/ContactContext';
-import { useNavigate } from 'react-router-dom';
 import { recognizeFace } from '../api/contacts';
 import { TrustedContactResponse } from '../api/types';
 import { storage } from '../utils/storage';
@@ -66,7 +65,6 @@ const CameraModal: React.FC<CameraModalProps> = ({ onClose }) => {
         context.drawImage(video, 0, 0);
         const imageData = canvas.toDataURL('image/jpeg');
         setCapturedImage(imageData);
-        setModalState('processing');
         
         // Convert canvas to blob and perform face recognition
         canvas.toBlob((blob) => {
@@ -131,7 +129,7 @@ const CameraModal: React.FC<CameraModalProps> = ({ onClose }) => {
     }
   };
 
-  const handleSaveSnap = () => {
+  const saveSnap = () => {
     if (recognizedContact) {
       recordSighting(recognizedContact.id, 'Current Location');
       storage.addRecognitionLog({
