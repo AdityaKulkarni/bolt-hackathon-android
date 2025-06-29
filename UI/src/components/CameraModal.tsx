@@ -154,11 +154,60 @@ const CameraModal: React.FC<CameraModalProps> = ({ onClose }) => {
     }
   };
 
+  // Memory score handlers
+  const handleRemembered = () => {
+    if (recognizedContact) {
+      storage.incrementMemoryScore(recognizedContact.id);
+      storage.addRecognitionLog({
+        contactId: recognizedContact.id,
+        name: recognizedContact.name,
+        relationship: recognizedContact.relationship,
+        picture: recognizedContact.picture,
+        phone: recognizedContact.phone,
+        location: recognizedContact.location,
+        timestamp: new Date().toISOString(),
+        image: capturedImage || undefined,
+      });
+      setCapturedImage(null);
+      setRecognizedContact(null);
+      setError(null);
+      if (!stream) {
+        startCamera();
+      } else if (videoRef.current && stream) {
+        videoRef.current.srcObject = stream;
+      }
+    }
+  };
+
+  const handleForgot = () => {
+    if (recognizedContact) {
+      storage.decrementMemoryScore(recognizedContact.id);
+      storage.addRecognitionLog({
+        contactId: recognizedContact.id,
+        name: recognizedContact.name,
+        relationship: recognizedContact.relationship,
+        picture: recognizedContact.picture,
+        phone: recognizedContact.phone,
+        location: recognizedContact.location,
+        timestamp: new Date().toISOString(),
+        image: capturedImage || undefined,
+      });
+      setCapturedImage(null);
+      setRecognizedContact(null);
+      setError(null);
+      if (!stream) {
+        startCamera();
+      } else if (videoRef.current && stream) {
+        videoRef.current.srcObject = stream;
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-white rounded-t-3xl w-full h-full max-w-md mx-auto relative">
+      <div className="bg-white rounded-t-3xl w-full h-full max-w-md mx-auto relative flex flex-col overflow-hidden">
         {/* Status Bar */}
-        <div className="flex justify-between items-center p-4 text-sm font-medium">
+        <div className="flex justify-between items-center p-4 text-sm font-medium bg-white">
           <span>9:30</span>
           <div className="flex items-center space-x-1">
             <div className="w-4 h-2 bg-black rounded-sm"></div>
@@ -169,7 +218,7 @@ const CameraModal: React.FC<CameraModalProps> = ({ onClose }) => {
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 mb-6">
+        <div className="flex items-center justify-between px-6 mb-6 bg-white">
           <h2 className="text-xl font-bold text-gray-900">Who's That Face?</h2>
           <button
             onClick={onClose}
@@ -179,102 +228,118 @@ const CameraModal: React.FC<CameraModalProps> = ({ onClose }) => {
           </button>
         </div>
 
-        {/* Camera/Image Display */}
-        <div className="px-6 mb-6">
-          <div className="relative bg-gray-200 rounded-2xl overflow-hidden aspect-square">
-            {!capturedImage ? (
-              <>
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Camera/Image Display */}
+          {!recognizedContact && <div className="px-6 mb-6">
+            <div className="relative bg-gray-200 overflow-hidden aspect-square">
+              {!capturedImage ? (
+                <>
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    onClick={capturePhoto}
+                    className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-4 shadow-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <Camera size={24} className="text-gray-800" />
+                  </button>
+                </>
+              ) : (
+                <img
+                  src={capturedImage}
+                  alt="Captured"
                   className="w-full h-full object-cover"
                 />
-                <button
-                  onClick={capturePhoto}
-                  className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-4 shadow-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Camera size={24} className="text-gray-800" />
-                </button>
-              </>
-            ) : (
-              <img
-                src={capturedImage}
-                alt="Captured"
-                className="w-full h-full object-cover"
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="px-6 mb-4">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-600 text-sm">{error}</p>
+              )}
             </div>
-          </div>
-        )}
+          </div>}
 
-        {/* Recognition Results */}
-        {capturedImage && (
-          <div className="px-6">
-            {isProcessing ? (
-              <div className="bg-gray-50 rounded-2xl p-6 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Recognizing face...</p>
+          {/* Error Message */}
+          {error && (
+            <div className="px-6 mb-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-600 text-sm">{error}</p>
               </div>
-            ) : recognizedContact ? (
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                {/* Contact Details */}
-                <div className="flex flex-col items-center mb-6">
-                  <img
-                    src={`https://boltsample.s3.us-west-1.amazonaws.com/${recognizedContact.picture}`}
-                    alt={recognizedContact.name}
-                    className="w-20 h-20 rounded-full object-cover mb-2"
-                  />
-                  <h3 className="text-lg font-semibold text-gray-900">{recognizedContact.name}</h3>
-                  <p className="text-purple-600 font-medium">{recognizedContact.relationship}</p>
-                  {recognizedContact.phone && (
-                    <p className="text-gray-500 text-sm mt-1">{recognizedContact.phone}</p>
-                  )}
-                  {recognizedContact.location && (
-                    <p className="text-gray-400 text-xs">{recognizedContact.location}</p>
-                  )}
+            </div>
+          )}
+
+          {/* Recognition Results */}
+          {capturedImage && (
+            <div className="px-6 pb-6">
+              {isProcessing ? (
+                <div className="bg-gray-50 rounded-2xl p-6 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Recognizing face...</p>
                 </div>
-                {/* End Contact Details */}
-                <p className="text-gray-600 mb-6 flex items-center justify-center">
-                  <span className="text-yellow-500 mr-2">👑</span>
-                  Your {recognizedContact.relationship.toLowerCase()} — {recognizedContact.lastSeenText}
-                </p>
-                <div className="flex space-x-3">
+              ) : recognizedContact ? (
+                <>
+                  <div className="bg-white rounded-2xl shadow-lg p-0 overflow-visible relative mb-4">
+                    {/* Top Image */}
+                    <div className="w-full h-48">
+                      <img
+                        src={`https://boltsample.s3.us-west-1.amazonaws.com/${recognizedContact.picture}`}
+                        alt={recognizedContact.name}
+                        className="w-full h-48 object-cover rounded-t-2xl"
+                      />
+                    </div>
+                    {/* Card Content */}
+                    <div className="pt-8 pb-6 px-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">You just saw {recognizedContact.name}</h3>
+                      <p className="text-purple-700 text-sm mb-2">💡 Your {recognizedContact.relationship.toLowerCase()}</p>
+                      <div className="flex space-x-3 mt-6">
+                        <button
+                          onClick={deleteSnap}
+                          className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-full font-semibold hover:bg-gray-200 transition-colors"
+                        >
+                          Delete Snap
+                        </button>
+                        <button
+                          onClick={saveSnap}
+                          className="flex-1 bg-purple-600 text-white py-3 rounded-full font-semibold hover:bg-purple-700 transition-colors"
+                        >
+                          Save Snap
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Memory Score Box */}
+                  <div className="bg-purple-50 border border-purple-200 rounded-2xl p-6 mt-4 text-center">
+                    <h4 className="text-base font-semibold text-purple-900 mb-1">Did you remember who this was?</h4>
+                    <p className="text-sm text-purple-700 mb-4">We'll help you keep track of your memory score</p>
+                    <div className="flex space-x-2 justify-center">
+                      <button
+                        className="flex-1 bg-white border border-purple-300 text-purple-700 py-2 rounded-full text-sm font-semibold hover:bg-purple-100 transition-colors"
+                        onClick={handleForgot}
+                      >
+                        No, I didn't
+                      </button>
+                      <button
+                        className="flex-1 bg-purple-600 text-white py-2 rounded-full text-sm font-semibold hover:bg-purple-700 transition-colors"
+                        onClick={handleRemembered}
+                      >
+                        Yes, I knew who it was!
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="bg-gray-50 rounded-2xl p-6 text-center">
+                  <p className="text-gray-600">No familiar faces detected</p>
                   <button
                     onClick={deleteSnap}
-                    className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-full font-semibold hover:bg-gray-200 transition-colors"
+                    className="mt-4 bg-gray-100 text-gray-700 py-3 px-6 rounded-full font-semibold hover:bg-gray-200 transition-colors"
                   >
-                    Delete Snap
-                  </button>
-                  <button
-                    onClick={saveSnap}
-                    className="flex-1 bg-purple-600 text-white py-3 rounded-full font-semibold hover:bg-purple-700 transition-colors"
-                  >
-                    Save Snap
+                    Try Again
                   </button>
                 </div>
-              </div>
-            ) : (
-              <div className="bg-gray-50 rounded-2xl p-6 text-center">
-                <p className="text-gray-600">No familiar faces detected</p>
-                <button
-                  onClick={deleteSnap}
-                  className="mt-4 bg-gray-100 text-gray-700 py-3 px-6 rounded-full font-semibold hover:bg-gray-200 transition-colors"
-                >
-                  Try Again
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
+        </div>
 
         <canvas ref={canvasRef} className="hidden" />
       </div>

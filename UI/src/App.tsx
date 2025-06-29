@@ -14,6 +14,7 @@ import SettingsPage from './components/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppRouter from './components/AppRouter';
 import AppContainer from './components/AppContainer';
+import InsightsPage from './components/InsightsPage';
 
 const App: React.FC = () => {
   return (
@@ -69,6 +70,11 @@ const App: React.FC = () => {
                 <Route path="/settings" element={
                   <ProtectedRoute>
                     <SettingsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/insights" element={
+                  <ProtectedRoute>
+                    <InsightsPage />
                   </ProtectedRoute>
                 } />
                 

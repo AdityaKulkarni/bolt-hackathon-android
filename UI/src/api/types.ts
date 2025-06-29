@@ -94,6 +94,7 @@ export interface Contact {
   location?: string;
   notes?: string;
   contact?: string;
+  memoryScore?: number; // Memory score for this contact
 }
 
 export interface CreateContactRequest {

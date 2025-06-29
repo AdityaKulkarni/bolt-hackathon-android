@@ -76,7 +76,7 @@ const WelcomeScreen: React.FC = () => {
             <img
               src="/bolt_logo.png"
               alt="Company Logo"
-              className="w-12 h-12 object-contain"
+              className="w-16 h-16 object-contain"
             />
           </div>
           <p className="text-xs text-gray-600 text-center mt-2 max-w-20">

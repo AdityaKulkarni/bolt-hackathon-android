@@ -103,7 +103,9 @@ export const storage = {
   getContacts: (): Contact[] => {
     try {
       const contactsData = localStorage.getItem(STORAGE_KEYS.CONTACTS);
-      return contactsData ? JSON.parse(contactsData) : [];
+      const contacts = contactsData ? JSON.parse(contactsData) : [];
+      // Ensure memoryScore is present
+      return contacts.map((c: Contact) => ({ ...c, memoryScore: typeof c.memoryScore === 'number' ? c.memoryScore : 0 }));
     } catch (error) {
       console.error('Error reading contacts from storage:', error);
       return [];
@@ -116,6 +118,20 @@ export const storage = {
     } catch (error) {
       console.error('Error writing contacts to storage:', error);
     }
+  },
+
+  // Increment memory score for a contact
+  incrementMemoryScore: (contactId: string): void => {
+    const contacts = storage.getContacts();
+    const updated = contacts.map(c => c.id === contactId ? { ...c, memoryScore: (c.memoryScore || 0) + 1 } : c);
+    storage.setContacts(updated);
+  },
+
+  // Decrement memory score for a contact
+  decrementMemoryScore: (contactId: string): void => {
+    const contacts = storage.getContacts();
+    const updated = contacts.map(c => c.id === contactId ? { ...c, memoryScore: (c.memoryScore || 0) - 1 } : c);
+    storage.setContacts(updated);
   },
 
   // Recognition log operations
