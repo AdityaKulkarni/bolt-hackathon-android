@@ -3,11 +3,23 @@ import BottomNavigation from './BottomNavigation';
 import { storage } from '../utils/storage';
 
 const InsightsPage: React.FC = () => {
-  // Calculate memory score
+  // Get all contacts and recognition logs
   const contacts = storage.getContacts();
-  const totalScore = contacts.reduce((sum, c) => sum + (c.memoryScore || 0), 0);
-  const maxScore = contacts.length * 5 || 1; // Assume 5 is max per contact for now
-  const percent = Math.round((totalScore / maxScore) * 100);
+  const recognitionLogs = storage.getRecognitionLogs();
+
+  // Filter contacts to only those with at least one recognition log and memoryScore > 0
+  const contactsWithLogs = contacts.filter(contact => {
+    const logs = recognitionLogs.filter(log => log.contactId === contact.id);
+    return logs.length > 0 && (contact.memoryScore || 0) > 0;
+  });
+
+  // Calculate accumulative memory score
+  const totalScore = contactsWithLogs.reduce((sum, c) => sum + (c.memoryScore || 0), 0);
+  const totalSeen = contactsWithLogs.reduce((sum, c) => {
+    const logs = recognitionLogs.filter(log => log.contactId === c.id);
+    return sum + logs.length;
+  }, 0);
+  const percent = totalSeen > 0 ? Math.round((totalScore / totalSeen) * 100) : 0;
 
   return (
     <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
@@ -58,7 +70,7 @@ const InsightsPage: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Per-Contact Memory Score</h3>
             <ul className="divide-y divide-gray-100">
               {contacts.map(contact => {
-                const logs = storage.getRecognitionLogs().filter(log => log.contactId === contact.id);
+                const logs = recognitionLogs.filter(log => log.contactId === contact.id);
                 const seenCount = logs.length;
                 if (seenCount === 0) return null;
                 return (

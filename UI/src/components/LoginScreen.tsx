@@ -57,7 +57,7 @@ const LoginScreen: React.FC = () => {
         {/* Header */}
         <div className="flex items-center mb-12">
           <img
-            src="/noun-face-recognition-4583755 1.png"
+            src="/app_logo.png"
             alt="MEMORIE Logo"
             className="w-8 h-8 mr-3"
           />

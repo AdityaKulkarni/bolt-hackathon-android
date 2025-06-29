@@ -44,7 +44,7 @@ const WelcomeScreen: React.FC = () => {
         <div className="mb-8">
           <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-lg mb-6">
             <img
-              src="/noun-face-recognition-4583755 1.png"
+              src="/app_logo.png"
               alt="MEMORIE Logo"
               className="w-20 h-20 object-contain"
             />
